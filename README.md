@@ -57,17 +57,10 @@ Warning: the jsonl files will consume a bit over 1gb of storage. Some of the lon
 ## Dependencies:
 
 - -wget
-
 - jsonlines
-
 - pandas
-
 - cryptography
-
 - sqlalchemy
-
 - tqdm
-
 - pymysql
-
 - mysql
