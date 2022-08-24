@@ -5,8 +5,8 @@ import cryptography
 from sqlalchemy import create_engine
 from sqlalchemy.dialects.mysql import JSON
 
+# tqdm is for progress bar generation.
 from tqdm import tqdm
-from time import sleep
 
 # Establish special datatypes for certain columns 
 dtype = {
