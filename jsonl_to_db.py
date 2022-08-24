@@ -79,7 +79,7 @@ def parsefile(filename):
             except:
                 wikipedia = ""
 
-            # Mew Dictionary of each column key.
+            # New Dictionary with the correct values and correct columns.
             data = {
                     'pos': [pos],
                     'head_templates': [head_templates],
