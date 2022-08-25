@@ -104,6 +104,7 @@ def parsefile(filename):
             df2 = pd.DataFrame(data)
             df2.to_sql("{}".format(filename), con = engine, if_exists = 'append', index=True, chunksize = 1000, method='multi', dtype=dtype)
 
+parsefile('determiners')
 parsefile('abbreviations')
 parsefile('adverbs')
 parsefile('articles')
