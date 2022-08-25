@@ -24,10 +24,12 @@ engine = create_engine("mysql+pymysql://{user}:{pw}@localhost/{db}"
                                pw="password123",
                                db="database_name"))
 
+
+
 # Script is slow, I need to find a way to make it faster.
 # generators is a possible solution.
 # consider using dict.keys() > yields a list of keys.
-"""
+
 # Main parser function.
 def parsefile(filename):
     with jsonlines.open("{}.jsonl".format(filename)) as reader:
@@ -97,6 +99,7 @@ def parsefile(filename):
             df2 = pd.DataFrame(data)
             df2.to_sql("{}".format(filename), con = engine, if_exists = 'append', index=True, chunksize = 1000, method='multi', dtype=dtype)
 
+"""
 parsefile('determiners')
 parsefile('abbreviations')
 parsefile('adverbs')
@@ -108,4 +111,61 @@ parsefile('pronouns')
 parsefile('adjectives')
 parsefile('nouns')
 parsefile('verbs')
+"""
+
+
+import multiprocessing
+
+
+if __name__ == "__main__":
+    # creating processes
+    p1 = multiprocessing.Process(target=parsefile, args=('articles',))
+    p2 = multiprocessing.Process(target=parsefile, args=('particles',))
+    p3 = multiprocessing.Process(target=parsefile, args=('abbreviations',))
+
+
+    # start processes
+    p1.start()
+    p2.start()
+    p3.start()
+
+    # wait until processes are finished
+    p1.join()
+    p2.join()
+    p3.join()
+
+    print("Three jobs done !")
+
+
+    p1 = multiprocessing.Process(target=parsefile, args=('determiners',))
+    p2 = multiprocessing.Process(target=parsefile, args=('conjunctions',))
+    p3 = multiprocessing.Process(target=parsefile, args=('pronouns',))
+    p4 = multiprocessing.Process(target=parsefile, args=('prepositions',))
+
+    p1.start()
+    p2.start()
+    p3.start()
+    p4.start()
+    p1.join()
+    p2.join()
+    p3.join()
+    p4.join()
+
+    print("Four jobs done !")
+
+    p1 = multiprocessing.Process(target=parsefile, args=('adverbs',))
+    p2 = multiprocessing.Process(target=parsefile, args=('adjectives',))
+    p3 = multiprocessing.Process(target=parsefile, args=('verbs',))
+    p4 = multiprocessing.Process(target=parsefile, args=('nouns',))
+
+    p1.start()
+    p2.start()
+    p3.start()
+    p4.start()
+    p1.join()
+    p2.join()
+    p3.join()
+    p4.join()
+
+print("All done !")
 
