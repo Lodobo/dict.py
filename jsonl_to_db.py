@@ -38,7 +38,6 @@ def parsefile(filename):
                 pos = str(pydict['pos'])
             else:
                 pos = ""
-
             if 'head_templates' in pydict:
                 head_templates = str(pydict['head_templates'])
             else:
@@ -47,42 +46,34 @@ def parsefile(filename):
                 etymology_text = str(pydict['etymology_text'])
             else:
                 etymology_text = ""
-            
             if 'etymology_templates' in pydict:
                 etymology_templates = str(pydict['etymology_templates'])
             else:
                 etymology_templates = ""
-            
             if 'sounds' in pydict:
                 sounds = str(pydict['sounds'])
             else:
                 sounds = ""
-            
             if 'forms' in pydict:
                 forms = str(pydict['forms'])
             else:
                 forms = ""
-            
             if 'word' in pydict:
                 word = str(pydict['word'])
             else:
                 word = ""
-            
             if 'lang' in pydict:
                 lang = str(pydict['lang'])
             else:
                 lang = ""
-            
             if 'lang_code' in pydict:
                 lang_code = str(pydict['lang_code'])
             else:
                 lang_code = ""
-            
             if 'senses' in pydict:
                 senses = str(pydict['senses'])
             else:
                 senses = ""
-            
             if 'wikipedia' in pydict:
                 wikipedia = str(pydict['wikipedia'])
             else:
