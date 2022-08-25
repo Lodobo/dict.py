@@ -27,6 +27,13 @@ engine = create_engine("mysql+pymysql://{user}:{pw}@localhost/{db}"
 # Script is slow, I need to find a way to make it faster.
 # generators is a possible solution.
 
+"""
+# More compact solution
+if "key1" in dictionary:
+    print("Key is in dictionary")
+Or use:
+dict.keys() > yields a list of keys.
+"""
 # Main parser function.
 def parsefile(filename):
     with jsonlines.open("{}.jsonl".format(filename)) as reader:
