@@ -26,13 +26,7 @@ engine = create_engine("mysql+pymysql://{user}:{pw}@localhost/{db}"
 
 # Script is slow, I need to find a way to make it faster.
 # generators is a possible solution.
-
-"""
-# More compact solution
-if "key1" in dictionary:
-    print("Key is in dictionary")
-Or use:
-dict.keys() > yields a list of keys.
+# consider using dict.keys() > yields a list of keys.
 """
 # Main parser function.
 def parsefile(filename):
@@ -40,50 +34,58 @@ def parsefile(filename):
         for pydict in tqdm(reader):
             
             # Check if the keys of the pydict dictionary exist.
-            try:
+            if 'pos' in pydict:
                 pos = str(pydict['pos'])
-            except:
-                Print("part of speech information is missing")
-                raise(Warning)
-            try:
+            else:
+                pos = ""
+
+            if 'head_templates' in pydict:
                 head_templates = str(pydict['head_templates'])
-            except:
+            else:
                 head_templates = ""
-            try:
+            if 'etymology_text' in pydict:
                 etymology_text = str(pydict['etymology_text'])
-            except:
+            else:
                 etymology_text = ""
-            try:
+            
+            if 'etymology_templates' in pydict:
                 etymology_templates = str(pydict['etymology_templates'])
-            except:
+            else:
                 etymology_templates = ""
-            try:
+            
+            if 'sounds' in pydict:
                 sounds = str(pydict['sounds'])
-            except:
+            else:
                 sounds = ""
-            try:
+            
+            if 'forms' in pydict:
                 forms = str(pydict['forms'])
-            except:
+            else:
                 forms = ""
-            try:
+            
+            if 'word' in pydict:
                 word = str(pydict['word'])
-            except:
+            else:
                 word = ""
-            try:
+            
+            if 'lang' in pydict:
                 lang = str(pydict['lang'])
-            except:
+            else:
                 lang = ""
-            try:
+            
+            if 'lang_code' in pydict:
                 lang_code = str(pydict['lang_code'])
-            except:
+            else:
                 lang_code = ""
-            try:
+            
+            if 'senses' in pydict:
                 senses = str(pydict['senses'])
-            except:
+            else:
                 senses = ""
-            try:
+            
+            if 'wikipedia' in pydict:
                 wikipedia = str(pydict['wikipedia'])
-            except:
+            else:
                 wikipedia = ""
 
             # New Dictionary with the correct values and correct columns.
