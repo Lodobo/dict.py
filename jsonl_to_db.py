@@ -48,9 +48,9 @@ def parsefile(filename):
             newDict = { k:v for (k,v) in zip(keys, values)}
             
             # Create and merge dataframes with all fields
-            df1 = pd.DataFrame(fields)
-            df2 = pd.DataFrame.from_dict([newDict])
-            df3 = df1.merge(df2, how='inner')
+            df1 = pd.DataFrame.from_dict([newDict])
+            df2 = pd.DataFrame(fields)
+            df3 = df1.merge(df2, how='right')
             
             # Convert and send dataframe object to sql database
             df3.to_sql("{}".format(filename), con = engine, if_exists = 'append', index=False, chunksize = 1000, method='multi', dtype=dtype)
