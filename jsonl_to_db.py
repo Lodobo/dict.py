@@ -63,3 +63,20 @@ def export_to_db():
         print("\n")
 
 export_to_db()
+
+engine.execute("DELETE FROM nouns WHERE LENGTH(word) > 35;")
+engine.execute("DELETE FROM verbs WHERE LENGTH(word) > 35;")
+engine.execute("DELETE FROM adjectives WHERE LENGTH(word) > 35;")
+engine.execute("DELETE FROM adverbs WHERE LENGTH(word) > 35;")
+
+engine.execute(" ALTER TABLE nouns MODIFY COLUMN nouns char(35)")
+engine.execute(" ALTER TABLE verbs MODIFY COLUMN verbs char(35)")
+engine.execute(" ALTER TABLE adjectives MODIFY COLUMN word char(35)")
+engine.execute(" ALTER TABLE adverbs MODIFY COLUMN word char(35)")
+engine.execute(" ALTER TABLE prepositions MODIFY COLUMN word char(30)")
+engine.execute(" ALTER TABLE pronouns MODIFY COLUMN word char(30)")
+engine.execute(" ALTER TABLE conjunctions MODIFY COLUMN word char(30)")
+engine.execute(" ALTER TABLE determiners MODIFY COLUMN word char(30)")
+engine.execute(" ALTER TABLE abbreviations MODIFY COLUMN word char(20)")
+engine.execute(" ALTER TABLE particles MODIFY COLUMN word char(20)")
+engine.execute(" ALTER TABLE articles MODIFY COLUMN word char(20)")
