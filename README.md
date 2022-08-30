@@ -33,7 +33,7 @@ SELECT syn.word, syn.sense FROM verbs, JSON_TABLE(verbs.synonyms, '$[*]'
 COLUMNS (
     `word` TEXT PATH '$.word',
     `sense` TEXT PATH '$.sense')
-    ) syn where verbs,word='see';
+    ) syn where verbs.word='see';
 ```
 ```sql
 -- Forms
