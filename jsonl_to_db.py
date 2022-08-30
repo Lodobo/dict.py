@@ -3,9 +3,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.dialects.mysql import JSON, TEXT, CHAR
 from alive_progress import alive_it
 
+
+
 # Enter your username and password to your SQL database. 
 user="username"
-pw="password"
+pw="password123"
 
 # Connect to database
 engine = create_engine(f"mysql+pymysql://{user}:{pw}@localhost/")
@@ -19,13 +21,16 @@ engine = create_engine(f"mysql+pymysql://{user}:{pw}@localhost/dictionary")
 # These are the desired datatypes for the SQL tables
 datatype = {
     'word': TEXT,
-    'pos': TEXT,
+    'pos': CHAR(10),
     'senses': JSON,
     'forms': JSON,
     'synonyms': JSON,
     'antonyms':JSON,
     'hypernyms': JSON,
     'hyponyms': JSON,
+    'meronyms': JSON,
+    'troponyms':JSON,
+    'holonyms': JSON,
     'sounds': JSON,
     'lang': CHAR(10),
     'lang_code': CHAR(3),
@@ -33,7 +38,14 @@ datatype = {
     'etymology_text': TEXT,
     'etymology_templates': JSON,
     'inflection_templates': JSON,
+    'coordinate_terms': JSON,
+    'form_of': JSON,
     'translations': JSON,
+    'source': JSON,
+    'hyphenation': JSON,
+    'proverbs': JSON,
+    'instances': JSON,
+    'abbreviations': JSON,
     'derived': JSON,
     'related': JSON,
     'wikipedia': JSON,
@@ -41,42 +53,30 @@ datatype = {
     }
 
 # Name of the files that are going to be parsed and sent to the database. 
-items = [
-    'articles',
-    'particles',
-    'abbreviations',
-    'determiners',
-    'conjunctions',
-    'pronouns',
-    'prepositions',
-    'adverbs',
-    'adjectives',
-    'verbs',
-    'nouns']
+items = ['articles','particles','abbreviations','determiners','conjunctions','pronouns','prepositions','adverbs','adjectives','verbs','nouns']
+
 
 # Main function. Creates a dataframe object from the jsonl files and sends them to the database.
-def export_to_db():
-    for item in alive_it(items):
-        df = pd.read_json(path_or_buf="{}.jsonl".format(item), lines=True)
-        df = df.astype(str) 
-        df.to_sql("{}".format(item), con = engine, if_exists = 'append', index=False, chunksize = 1000, method='multi',dtype=datatype)
-        print("\n")
+def export_to_db(fn):
+        df = pd.read_json(path_or_buf="{}.jsonl".format(fn), lines=True)
+        df.to_sql("{}".format(fn), con = engine, if_exists = 'replace', index=False, chunksize = 1000, method='multi',dtype=datatype)
 
-export_to_db()
+def change_type(table):
+    
+    # Delete long words
+    engine.execute("DELETE FROM {} WHERE LENGTH(word) > 30".format(table))
+    
+    # Alter datatypes
+    engine.execute(" ALTER TABLE {} MODIFY COLUMN word char(30)".format(table))
 
-engine.execute("DELETE FROM nouns WHERE LENGTH(word) > 35;")
-engine.execute("DELETE FROM verbs WHERE LENGTH(word) > 35;")
-engine.execute("DELETE FROM adjectives WHERE LENGTH(word) > 35;")
-engine.execute("DELETE FROM adverbs WHERE LENGTH(word) > 35;")
 
-engine.execute(" ALTER TABLE nouns MODIFY COLUMN nouns char(35)")
-engine.execute(" ALTER TABLE verbs MODIFY COLUMN verbs char(35)")
-engine.execute(" ALTER TABLE adjectives MODIFY COLUMN word char(35)")
-engine.execute(" ALTER TABLE adverbs MODIFY COLUMN word char(35)")
-engine.execute(" ALTER TABLE prepositions MODIFY COLUMN word char(30)")
-engine.execute(" ALTER TABLE pronouns MODIFY COLUMN word char(30)")
-engine.execute(" ALTER TABLE conjunctions MODIFY COLUMN word char(30)")
-engine.execute(" ALTER TABLE determiners MODIFY COLUMN word char(30)")
+for pos in alive_it(items):
+    export_to_db(pos)
+    change_type(pos)
+
+
 engine.execute(" ALTER TABLE abbreviations MODIFY COLUMN word char(20)")
-engine.execute(" ALTER TABLE particles MODIFY COLUMN word char(20)")
-engine.execute(" ALTER TABLE articles MODIFY COLUMN word char(20)")
+engine.execute(" ALTER TABLE particles MODIFY COLUMN word char(10)")
+engine.execute(" ALTER TABLE articles MODIFY COLUMN word char(10)")
+
+print("All done !")
