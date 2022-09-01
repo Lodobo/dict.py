@@ -3,8 +3,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.dialects.mysql import JSON, TEXT, CHAR
 from alive_progress import alive_it
 
-
-
 # Enter your username and password to your SQL database. 
 user="username"
 pw="password123"
@@ -52,31 +50,24 @@ datatype = {
     'categories':JSON
     }
 
+# Main function. Creates a dataframe object from the jsonl files and sends them to the database.
+def export_to_db(fn):
+        
+        # Read file
+        df = pd.read_json(path_or_buf="{}.jsonl".format(fn), lines=True)
+        
+        # Delete rows if words are too long.
+        indexNames = df[ df['word'].str.len() > 30].index 
+        df.drop(indexNames, inplace=True)
+        
+        # Send to mysql database
+        df.to_sql("{}".format(fn), con = engine, if_exists = 'replace', index=False, chunksize = 1000, method='multi',dtype=datatype)
+
+
 # Name of the files that are going to be parsed and sent to the database. 
 items = ['articles','particles','abbreviations','determiners','conjunctions','pronouns','prepositions','adverbs','adjectives','verbs','nouns']
 
-
-# Main function. Creates a dataframe object from the jsonl files and sends them to the database.
-def export_to_db(fn):
-        df = pd.read_json(path_or_buf="{}.jsonl".format(fn), lines=True)
-        df.to_sql("{}".format(fn), con = engine, if_exists = 'replace', index=False, chunksize = 1000, method='multi',dtype=datatype)
-
-def change_type(table):
-    
-    # Delete long words
-    engine.execute("DELETE FROM {} WHERE LENGTH(word) > 30".format(table))
-    
-    # Alter datatypes
-    engine.execute(" ALTER TABLE {} MODIFY COLUMN word char(30)".format(table))
-
-
 for pos in alive_it(items):
     export_to_db(pos)
-    change_type(pos)
-
-
-engine.execute(" ALTER TABLE abbreviations MODIFY COLUMN word char(20)")
-engine.execute(" ALTER TABLE particles MODIFY COLUMN word char(10)")
-engine.execute(" ALTER TABLE articles MODIFY COLUMN word char(10)")
 
 print("All done !")
