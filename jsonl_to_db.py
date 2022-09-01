@@ -18,7 +18,7 @@ engine = create_engine(f"mysql+pymysql://{user}:{pw}@localhost/dictionary")
 
 # These are the desired datatypes for the SQL tables
 datatype = {
-    'word': TEXT,
+    'word': CHAR(30),
     'pos': CHAR(10),
     'senses': JSON,
     'forms': JSON,
