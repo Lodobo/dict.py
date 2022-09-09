@@ -22,7 +22,7 @@ Warning: the jsonl files will consume a bit over 1gb of storage.
 |options|Description|
 |----|----|
 |-h, --help|Show a help mesage|
-|-w [WORD], --word [WORD]|Search given word in dictionary|
+|-w [WORD], --word [WORD]|Search for given word in dictionary|
 |-p [part of speech], --pos [part of speech]|Specify a specific part of speech to search in|
 |-e, --examples|Show examples|
 
