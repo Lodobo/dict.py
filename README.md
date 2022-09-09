@@ -2,7 +2,7 @@
 
 ## Description
 
-This repository has three scripts. wiktionary-downloader.sh is a bash script that downloads wiktionary entries from kaikki.org with wget. todb.py is a python script that parses the downloaded jsonl files and sends the information to a database. Finally, TDict.py is a TUI dictionary implementation of the database.
+This repository has three scripts. `wiktionary-downloader.sh` is a bash script that downloads wiktionary entries from kaikki.org with `wget`. `todb.py` is a python script that parses the downloaded jsonl files and sends the information to a database. Finally, `TDict.py` is a TUI dictionary implementation of the database.
 
 Warning: the jsonl files will consume a bit over 1gb of storage.
 
