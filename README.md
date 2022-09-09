@@ -2,23 +2,31 @@
 
 ## Description
 
-This repository has two scripts. First, a bash script that downloads wiktionary entries from kaikki.org with wget to a .jsonl file. Second, a python script that parses the jsonl files and sends the information to a database.
-
-Each jsonl file corresponds to a part of speech (e.g. nouns). The script will create a table for each part of speech.
+This repository has three scripts. wiktionary-downloader.sh is a bash script that downloads wiktionary entries from kaikki.org with wget. todb.py is a python script that parses the downloaded jsonl files and sends the information to a database. Finally, TDict.py is a TUI dictionary implementation of the database.
 
 Warning: the jsonl files will consume a bit over 1gb of storage.
 
 ## Dependencies:
 
-- wget
 - pandas
 - cryptography
 - sqlalchemy
-- alive_progress
 - pymysql
 - mysql
+- rich
+- alive_progress
+- wget
 
-## How to fetch underlying JSON objects:
+## Using TDict.py
+
+|options|Description|
+|----|----|
+|-h, --help|Show a help mesage|
+|-w [WORD], --word [WORD]|Search given word in dictionary|
+|-p [part of speech], --pos [part of speech]|Specify a specific part of speech to search in|
+|-e, --examples|Show examples|
+
+## How to fetch underlying JSON objects in SQL:
 ```sql
 -- Definitions
 SELECT sn.raw_glosses, sn.glosses FROM verbs, JSON_TABLE(verbs.senses, '$[*]'
