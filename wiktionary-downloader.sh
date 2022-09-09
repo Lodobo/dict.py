@@ -32,3 +32,6 @@ wget --output-document="verbs.jsonl" https://kaikki.org/dictionary/English/by-po
 
 # nouns
 wget --output-document="nouns.jsonl" https://kaikki.org/dictionary/English/by-pos/noun/kaikki.org-dictionary-English-by-pos-noun.json
+
+# All words
+wget --output-document="all_words.jsonl" https://kaikki.org/dictionary/English/kaikki.org-dictionary-English.json
