@@ -7,7 +7,6 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.padding import Padding
 from rich.text import Text
-from rich.markup import escape
 
 import argparse
 import json
@@ -80,7 +79,7 @@ for index, row in df.iterrows():
 
             if args.examples and 'examples' in i:
                 example = f"Ex: {i['examples'][0]['text']}\n"
-                example = escape(example)
+                example = example
                 example = Text(example)
                 example.stylize("grey70")
                 example = Padding(example, (0,2))
