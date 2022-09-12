@@ -25,6 +25,8 @@ Warning: the jsonl files will consume a bit over 1gb of storage.
 |-w [WORD], --word [WORD]|Search for given word in dictionary|
 |-p [part of speech], --pos [part of speech]|Specify a specific part of speech to search in|
 |-e, --examples|Show examples|
+|-E, --etymology|Show the etymology of the word|
+|-s, --synonyms|Show the synonyms and antonyms of the word|
 
 ## How to fetch underlying JSON objects in SQL:
 ```sql
