@@ -1,25 +1,30 @@
+# Usage : 'python3 todb.py -l en'
+
 import pandas as pd    
 from sqlalchemy import create_engine
 from sqlalchemy.dialects.mysql import JSON, TEXT, CHAR
+from sqlalchemy_utils import database_exists, create_database
 from alive_progress import alive_bar
 
+import os, argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-l", "--language", type=str, help="Select language.")    
+args = parser.parse_args()
 
 # Enter your username and password to your SQL database. 
 user="username"
 pw="password123"
 
-# Connect to database
-engine = create_engine(f"mysql+pymysql://{user}:{pw}@localhost/")
-
-# Create a database called dictionary
-engine.execute("CREATE DATABASE dictionary")
-
-# Connection to the dictionary database
 engine = create_engine(f"mysql+pymysql://{user}:{pw}@localhost/dictionary")
 
-# Desired datatypes for the SQL tables
+# Check if database already exists
+if not database_exists(engine.url):
+    create_database(engine.url)
+
+# Datatypes for the SQL tables
 datatype = {
-    'word': CHAR(30),
+    'word': CHAR(30, collation="utf8mb4_unicode_ci"),
     'pos': CHAR(15),
     'senses': JSON,
     'forms': JSON,
@@ -34,7 +39,7 @@ datatype = {
     'lang': CHAR(10),
     'lang_code': CHAR(3),
     'head_templates': JSON,
-    'etymology_text': TEXT,
+    'etymology_text': TEXT(collation="utf8mb4_unicode_ci"),
     'etymology_templates': JSON,
     'inflection_templates': JSON,
     'coordinate_terms': JSON,
@@ -52,8 +57,12 @@ datatype = {
     'topics':JSON
     }
 
+print("\nSending data to MySQL database")
+
 # Main function. Creates a dataframe object from the jsonl files and sends the data to the database.
 def export_to_db(fn):
+
+    pwd = os.getcwd()
 
     # Count total lines for progress bar generation
     with open(f"{fn}.jsonl", 'r') as fp:
@@ -63,7 +72,7 @@ def export_to_db(fn):
 
     with alive_bar(num_lines, title=f"{fn}", title_length=13, spinner=None) as bar: 
 
-        chunk = pd.read_json(path_or_buf="{}.jsonl".format(fn), lines=True, chunksize=2000)
+        chunk = pd.read_json(path_or_buf=f"{fn}.jsonl", lines=True, chunksize=2000)
         for df2 in chunk:
             df = pd.concat([df1, df2])
             x = df.shape[0]
@@ -76,13 +85,19 @@ def export_to_db(fn):
     # create index on table for faster read speeds
     engine.execute(f"CREATE INDEX `idx` ON {fn} (word)")
 
-# Name of the files that are going to be parsed and sent to the database. 
-items = ['articles','particles','determiners','conjunctions','prepositions','pronouns','abbreviations','adverbs','adjectives','verbs','nouns','all_words']
+items = ['en_articles','en_particles','en_determiners','en_conjunctions','en_prepositions','en_pronouns','en_abbreviations','en_adverbs','en_adjectives','en_verbs','en_nouns','en']
+# valid language options: ['en', 'fr', 'sv', 'la', 'es', 'de', 'it', 'ru','fi','ar','nl','no','da','se']
 
-for item in items:
-    export_to_db(item)
 
-print("\nAll done !")
+# Execute the function
+if args.language == 'en':
+
+    for item in items:
+        export_to_db(item)
+else:
+    export_to_db(f'{args.language}')
+
+print("\nData has succesfully been sent to the database !")
 
 
 
