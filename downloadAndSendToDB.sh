@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# Usage : 'script.sh en fr sv es'
 
 # English (en)
 # French (fr)
