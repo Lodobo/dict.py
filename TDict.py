@@ -1,88 +1,103 @@
-#!/usr/bin/env python3
+# Usage : 'python3 todb.py -l en'
 
 import pandas as pd    
 from sqlalchemy import create_engine
-from sqlalchemy import text
-from rich.console import Console
-from rich.panel import Panel
-from rich.padding import Padding
-from rich.text import Text
+from sqlalchemy.dialects.mysql import JSON, TEXT, CHAR
+from sqlalchemy_utils import database_exists, create_database
+from alive_progress import alive_bar
 
-import argparse
-import json
+import os, argparse
 
-
-user="admin"
-pw="euthymia"
-engine = create_engine(f"mysql+pymysql://{user}:{pw}@localhost/dictionary")
-
-# Command line arguments
 parser = argparse.ArgumentParser()
-parser.add_argument("-w", "--word", type=str, help="Search for word in dictionary")
-parser.add_argument("-p", "--pos", type=str, help="Specify a specific part of speech to search in")
-parser.add_argument("-e", "--examples", help="Show examples", action="store_true")
+parser.add_argument("-l", "--language", type=str, help="Select language.")    
 args = parser.parse_args()
 
+# Enter your username and password to your SQL database. 
+user="username"
+pw="password"
+
+engine = create_engine(f"mysql+pymysql://{user}:{pw}@localhost/dictionary")
+
+# Check if database already exists
+if not database_exists(engine.url):
+    create_database(engine.url)
+
+# Datatypes for the SQL tables
+datatype = {
+    'word': CHAR(30, collation="utf8mb4_unicode_ci"),
+    'pos': CHAR(15),
+    'senses': JSON,
+    'forms': JSON,
+    'synonyms': JSON,
+    'antonyms':JSON,
+    'hypernyms': JSON,
+    'hyponyms': JSON,
+    'meronyms': JSON,
+    'troponyms':JSON,
+    'holonyms': JSON,
+    'sounds': JSON,
+    'lang': CHAR(10),
+    'lang_code': CHAR(3),
+    'head_templates': JSON,
+    'etymology_text': TEXT(collation="utf8mb4_unicode_ci"),
+    'etymology_templates': JSON,
+    'inflection_templates': JSON,
+    'coordinate_terms': JSON,
+    'form_of': JSON,
+    'translations': JSON,
+    'source': JSON,
+    'hyphenation': JSON,
+    'proverbs': JSON,
+    'instances': JSON,
+    'abbreviations': JSON,
+    'derived': JSON,
+    'related': JSON,
+    'wikipedia': JSON,
+    'categories':JSON,
+    'topics':JSON
+    }
+
+print("\nSending data to MySQL database")
+
+# Main function. Creates a dataframe object from the jsonl files and sends the data to the database.
+def export_to_db(fn):
+
+    pwd = os.getcwd()
+
+    # Count total lines for progress bar generation
+    with open(f"{fn}.jsonl", 'r') as fp:
+        num_lines = sum(1 for line in fp)
+
+    df1 = pd.DataFrame(columns=['word','pos','senses','forms','synonyms','antonyms','hypernyms','hyponyms','meronyms','troponyms','holonyms','sounds','lang','lang_code','head_templates','etymology_text','etymology_templates','inflection_templates','coordinate_terms','form_of','translations','source','hyphenation','proverbs','instances','abbreviations','derived','related','wikipedia','categories','topics'])
+
+    with alive_bar(num_lines, title=f"{fn}", title_length=13, spinner=None) as bar: 
+
+        chunk = pd.read_json(path_or_buf=f"{fn}.jsonl", lines=True, chunksize=2000)
+        for df2 in chunk:
+            df = pd.concat([df1, df2])
+            x = df.shape[0]
+
+            indexNames = df[ df['word'].str.len() > 30].index
+            df.drop(indexNames, inplace=True)
+            df.to_sql(f"{fn}", con = engine, if_exists = 'append', index=False, chunksize = 2000, dtype=datatype)
+            bar(x)
+    
+    # create index on table for faster read speeds
+    engine.execute(f"CREATE INDEX `idx` ON {fn} (word)")
+
+items = ['en_articles','en_particles','en_determiners','en_conjunctions','en_prepositions','en_pronouns','en_abbreviations','en_adverbs','en_adjectives','en_verbs','en_nouns','en']
+# valid language options: ['en', 'fr', 'sv', 'la', 'es', 'de', 'it', 'ru','fi','ar','nl','no','da','se']
 
 
-if args.word:
-    pass
+# Execute the function
+if args.language == 'en':
+
+    for item in items:
+        export_to_db(item)
 else:
-    print("\nError : No input\n")
-    quit()
+    export_to_db(f'{args.language}')
 
-items = ['articles','particles','determiners','conjunctions','prepositions','pronouns','abbreviations','adverbs','adjectives','verbs','nouns']
+print("\nData has succesfully been sent to the database !")
 
-if args.pos in items:
-    data = f"SELECT * FROM {args.pos} WHERE word='{args.word}'"
-
-elif args.pos == None: 
-    data = f"SELECT * FROM all_words WHERE word='{args.word}'"
-else:
-    print("\nError : Incorrect pos\n")
-    print("You can search in the following parts of speech :\n")
-    print("articles, particles, determiners, conjunctions, prepositions, pronouns,\nabbreviations, adverbs, adjectives, verbs, nouns")
-    quit()
-
-df = pd.read_sql(data, con=engine)
-df = df.sort_values(by=['pos'])
-
-console = Console()
-
-console.rule(f"[bold white]"+f"{args.word}".upper())
-
-for index, row in df.iterrows():
-    pos = row['pos']
-    pos = pos.upper()
-
-    if pos == "INTJ":
-        pos = "INTERJECTION"
-
-    if 'sounds' in row and row['sounds'] != 'null':
-        console.print(Panel(f"[bold white] {pos}", width=6 + len(pos)))
-
-        tmp = json.loads(row['sounds'])
-        for i in tmp:
-            if 'tags' in i and 'ipa' in i:
-                console.print(f"[bold]{i['tags'][0]}[/bold] : [bright_cyan]{i['ipa']}", end="\n")
-            elif 'ipa' in i and i['ipa'] != "":
-                console.print(f"[bold]IPA[/bold] : [bright_cyan]{i['ipa']}")
-
-        tmp = json.loads(row['senses'])
-
-
-        console.print("\n[bold][underline]Definitions[/underline] : \n")
-        for count, i in enumerate(tmp, start=1):
-            glosses = i['glosses']
-            glosses = " > ".join(glosses)
-            console.print(f"{count}. {glosses}\n")
-
-            if args.examples and 'examples' in i:
-                example = f"Ex: {i['examples'][0]['text']}\n"
-                example = example
-                example = Text(example)
-                example.stylize("grey70")
-                example = Padding(example, (0,2))
-                console.print(example)
 
 
