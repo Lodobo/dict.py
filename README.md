@@ -24,6 +24,7 @@ Warning: the jsonl files will consume a bit over 1gb of storage.
 |-h, --help|Show a help mesage|
 |-w [WORD], --word [WORD]|Search for given word in dictionary|
 |-p [part of speech], --pos [part of speech]|Specify a specific part of speech to search in|
+|-l [lang], --language [lang]|Select language to search in|
 |-e, --examples|Show examples|
 |-E, --etymology|Show the etymology of the word|
 |-s, --synonyms|Show the synonyms and antonyms of the word|
