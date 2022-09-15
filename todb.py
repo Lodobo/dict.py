@@ -81,7 +81,7 @@ def export_to_db(fn):
 
             indexNames = df[ df['word'].str.len() > 30].index
             df.drop(indexNames, inplace=True)
-            df.to_sql(f"{fn}", con = engine, if_exists = 'append', index=False, chunksize = 2000, dtype=datatype)
+            df.to_sql(f"{fn}", con = engine, if_exists = 'append', index=True, chunksize = 2000, dtype=datatype)
             bar(x)
     
     # create index on table for faster read speeds
