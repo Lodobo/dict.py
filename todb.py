@@ -2,7 +2,7 @@
 
 import pandas as pd    
 from sqlalchemy import create_engine
-from sqlalchemy.dialects.mysql import JSON, TEXT, CHAR
+from sqlalchemy.dialects.mysql import INTEGER, JSON, TEXT, CHAR
 from sqlalchemy_utils import database_exists, create_database
 from alive_progress import alive_bar
 
@@ -24,6 +24,7 @@ if not database_exists(engine.url):
 
 # Datatypes for the SQL tables
 datatype = {
+    'index':INTEGER,
     'word': CHAR(30, collation="utf8mb4_unicode_ci"),
     'pos': CHAR(15),
     'senses': JSON,
@@ -54,6 +55,7 @@ datatype = {
     'related': JSON,
     'wikipedia': JSON,
     'categories':JSON,
+    'alt_of':JSON,
     'topics':JSON
     }
 
@@ -68,7 +70,7 @@ def export_to_db(fn):
     with open(f"{fn}.jsonl", 'r') as fp:
         num_lines = sum(1 for line in fp)
 
-    df1 = pd.DataFrame(columns=['word','pos','senses','forms','synonyms','antonyms','hypernyms','hyponyms','meronyms','troponyms','holonyms','sounds','lang','lang_code','head_templates','etymology_text','etymology_templates','inflection_templates','coordinate_terms','form_of','translations','source','hyphenation','proverbs','instances','abbreviations','derived','related','wikipedia','categories','topics'])
+    df1 = pd.DataFrame(columns=['word','pos','senses','forms','synonyms','antonyms','hypernyms','hyponyms','meronyms','troponyms','holonyms','sounds','lang','lang_code','head_templates','etymology_text','etymology_templates','inflection_templates','coordinate_terms','form_of','translations','source','hyphenation','proverbs','instances','abbreviations','derived','related','wikipedia','categories','alt_of','topics'])
 
     with alive_bar(num_lines, title=f"{fn}", title_length=13, spinner=None) as bar: 
 
@@ -85,7 +87,7 @@ def export_to_db(fn):
     # create index on table for faster read speeds
     engine.execute(f"CREATE INDEX `idx` ON {fn} (word)")
 
-items = ['en_articles','en_particles','en_determiners','en_conjunctions','en_prepositions','en_pronouns','en_abbreviations','en_adverbs','en_adjectives','en_verbs','en_nouns','en']
+items = ['en_articles','en_particles','en_determiners','en_conjunctions','en_prepositions','en_pronouns','en_abbreviations','en_adverbs','en_adjectives','en_verbs','en_nouns','en','en_lexemes']
 # valid language options: ['en', 'fr', 'sv', 'la', 'es', 'de', 'it', 'ru','fi','ar','nl','no','da','se']
 
 
