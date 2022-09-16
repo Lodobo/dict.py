@@ -21,7 +21,7 @@ To quickly set up the database, it is possible to directly download a sql file. 
     - `$ mysql –u username –p dictionary < en.sql`
     - And any optional languages: `$ mysql –u username –p dictionary < french.sql`
  
-Warning: the jsonl files will consume a bit over 1gb of storage.
+Warning: the en.sql file is 400mb in size in compressed format and 3.2 gb when uncompressed. The extra-languages.sql file is 680mb in size in compressed format and 7.9 gb when uncompressed. 
 
 ## Dependencies:
 
