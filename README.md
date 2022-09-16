@@ -1,9 +1,26 @@
-# wiktionary-to-mysql
+# TUI-Dictionary
+
+!screenshot.png(https://github.com/Lodobo/TUI-Dictionary/blob/main/screenshot.png?raw=true)
 
 ## Description
 
 This repository has four scripts. `downloader.sh` is a bash script that downloads wiktionary entries from kaikki.org with `wget`. `todb.py` is a python script that parses the downloaded jsonl files and sends the information to a database. `downloadAndSendToDB.sh` is a bash script that downloads AND runs the todb.py script. Finally, `TDict.py` is a TUI dictionary implementation of the database.
 
+To quickly set up the database, it is possible to directly download a sql file. Just do the following :
+1) Install mysql
+2) Download .sql file(s):
+    - For the english dictionary: `$ wget https://www.dropbox.com/s/mgb1982eo8u6850/en.zip`
+    - For extra languages (option): `$ wget https://www.dropbox.com/s/za14slf0hqfk2yl/extra-languages.zip`
+3) Unzip file(s):
+    - `$ unzip en.zip`
+    - `$ unzip extra-languages.zip`
+4) Launch mysql and create account
+5) Create database:
+    - `mysql> CREATE DATABASE dictionary;`
+6) Import tables to database:
+    - `$ mysql –u username –p dictionary < en.sql`
+    - And any optional languages: `$ mysql –u username –p dictionary < french.sql`
+ 
 Warning: the jsonl files will consume a bit over 1gb of storage.
 
 ## Dependencies:
