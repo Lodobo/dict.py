@@ -38,13 +38,14 @@ Warning: the en.sql file is 400mb in size in compressed format and 3.2 gb when u
 
 |options|Description|
 |----|----|
-|-h, --help|Show a help mesage|
-|-w [WORD], --word [WORD]|Search for given word in dictionary|
-|-p [part of speech], --pos [part of speech]|Specify a specific part of speech to search in|
-|-l [lang], --language [lang]|Select language to search in|
-|-e, --examples|Show examples|
-|-E, --etymology|Show the etymology of the word|
-|-s, --synonyms|Show the synonyms and antonyms of the word|
+|-h, --help|show a help mesage|
+|-w [WORD], --word [WORD]|search for given word in dictionary|
+|-p [part of speech], --pos [part of speech]|specify a specific part of speech to search in|
+|-l [lang], --language [lang]|select language to search in|
+|-e, --examples|show examples|
+|-E, --etymology|show the etymology of the word|
+|-s, --synonyms|show the synonyms and antonyms of the word|
+|-r, --random|search a random word in the dictionary|
 
 ## How to fetch underlying JSON objects in SQL:
 ```sql
