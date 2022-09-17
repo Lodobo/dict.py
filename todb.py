@@ -71,7 +71,6 @@ def create_table(tablename):
     Index('idx', table.c.index)
     Index('word_idx', table.c.word)
     Index('pos-idx', table.c.pos)
-    Index('lang-idx', table.c.lang_code)
     meta.create_all(engine)
 
 # Datatypes for the SQL tables
