@@ -1,6 +1,6 @@
 # TUI-Dictionary
 
-![screenshot.png](https://github.com/Lodobo/TUI-Dictionary/blob/main/screenshot.png?raw=true)
+![screenshot.jpg](https://raw.githubusercontent.com/Lodobo/TUI-Dictionary/main/screenshot.jpg)
 
 ## Description
 
