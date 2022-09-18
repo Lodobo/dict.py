@@ -36,6 +36,8 @@ Warning: the en.sql file is 400mb in size in compressed format and 3.2 gb when u
 
 **To install pip dependencies**:
 `pip install -r requirements.txt`
+or:
+`python3 -m pip install -r requirements.txt
 
 ## Using TDict.py
 
