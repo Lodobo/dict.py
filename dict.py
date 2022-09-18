@@ -89,7 +89,6 @@ row_counts = {
 
 ###### DECIDING WHAT DATA TO REQUEST #
 if args.random:
-    # max_row = row_counts[f'{args.language}']
     randrow = random.randint(1, 645944)
     data = f"SELECT * FROM `en_lexemes` where `index`='{randrow}'"
 elif args.pos:
