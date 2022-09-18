@@ -34,7 +34,7 @@ Warning: the en.sql file is 400mb in size in compressed format and 3.2 gb when u
 - alive_progress
 - wget
 
-*To install pip dependencies*:
+**To install pip dependencies**:
 `pip install -r requirements.txt`
 
 ## Using TDict.py
