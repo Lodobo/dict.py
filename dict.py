@@ -6,7 +6,7 @@
 
 import argparse, json, random
 import pandas as pd
-import numpy as np
+from numpy import nan
 from sqlalchemy import create_engine
 from rich.console import Console
 from rich.columns import Columns
@@ -27,21 +27,24 @@ parser.add_argument("-r", "--random", help="Discover a random word", default=Fal
 args = parser.parse_args()
 # defining CLI arguments ######
 
+###### Define colors #
+sound_color = '#bd92f8'
+ety_color =  '#8ae9fc'
+example_color = '#bbbbbb'
+tag_color = '#bbbbbb'
+# Define colors ######
+
 ###### ERROR HANDLING # 
 possible_langs = ('en','fr','sv','ls','es','de','it','ru','fi','ar','nl','no','nb','nn','da','se','ls','rs','ss','ru','pt','pl','zh','ja','is','ur')
+possible_pos = (None,'abbrev','adj','adv','adv_phrase','affix','article','character','circumfix','conj','det','infix','interfix','name','noun','num','particle','phrase','postp','prefix','prep','prep_phrase','pron','proverb','punct','suffix','symbol','verb')
 
 if args.language not in possible_langs:
     print("\nError : not a valid language\n")
     quit()
-
-possible_pos = (None,'abbrev','adj','adv','adv_phrase','affix','article','character','circumfix','conj','det','infix','interfix','name','noun','num','particle','phrase','postp','prefix','prep','prep_phrase','pron','proverb','punct','suffix','symbol','verb')
-
-
 if args.pos not in possible_pos:
     print("\nError : not a valid part of speech\n")
     print("Options : abbrev, adj, adv, adv_phrase, affix, article, character, conj, det, name, noun, num, particle, phrase, postp, prep, prep_phrase, pron, verb\n")
     quit()
-
 if args.word == None and args.random == False:
     print("\nError : Expected one argument : --random or --word\n")
     quit()
@@ -53,59 +56,42 @@ if args.random and args.pos:
 # ERROR HANDLING ######
 
 
-# ROW COUNT FOR GENERATING RANDOM WORDS. 
-# Feeding this into rand.int seems to sometimes generate integers that are bigger than expected.
-"""
-row_counts = {
-    'en':1158999,
-    'en_lexemes':645944,
-    'fr':385127,
-    'sv':138190,
-    'ls':966,
-    'la':860994,
-    'es':726291,
-    'de':321953,
-    'it':610398,
-    'ru':424502,
-    'fi':229875,
-    'ar':127297,
-    'nl':128689,
-    'no':1778,
-    'nb':72748,
-    'nn':59385,
-    'da':47233,
-    'se':5446,
-    'smj':966,
-    'smn':570,
-    'sms':616,
-    'ru':424502,
-    'pt':307671,
-    'pl':128261,
-    'zh':163317,
-    'ja':134965,
-    'is':22839,
-    'ur':5050}
-"""
+# Define the Engine (Connection Object)
+# Please Insert your database credentials.
+engine = create_engine("mysql+pymysql://{user}:{pw}@localhost/dictionary"
+                        .format(user="admin",pw="euthymia"))
 
 ###### DECIDING WHAT DATA TO REQUEST #
 if args.random:
+    # max_row = row_counts[f'{args.language}']
     randrow = random.randint(1, 645944)
-    data = f"SELECT * FROM `en_lexemes` where `index`='{randrow}'"
+    data = f"""
+    SELECT
+    word,pos,senses,sounds,etymology_text,synonyms,antonyms,hypernyms,hyponyms,meronyms,holonyms
+    FROM `en_lexemes`
+    WHERE `index`='{randrow}'
+    """
 elif args.pos:
-    data = f"SELECT * FROM `{args.language}` WHERE word='{args.word}' and pos='{args.pos}'"
+    data = f"""
+    SELECT
+    word,pos,senses,sounds,etymology_text,synonyms,antonyms,hypernyms,hyponyms,meronyms,holonyms
+    FROM `{args.language}`
+    WHERE word='{args.word}' AND pos='{args.pos}'
+    """
 else:
-    data = f"SELECT * FROM `{args.language}` WHERE word='{args.word}'"
+    data = f"""
+    SELECT
+    word,pos,senses,sounds,etymology_text,synonyms,antonyms,hypernyms,hyponyms,meronyms,holonyms
+    FROM `{args.language}`
+    WHERE word='{args.word}'
+    """
 # DECIDING WHAT DATA TO REQUEST ######
 
-# Database connection info. Insert your database credentials.
-engine = create_engine("mysql+pymysql://{user}:{pw}@localhost/dictionary"
-                        .format(user="username",pw="password123"))
 
 # Fetch data from database and store it in a dataframe.
 df = pd.read_sql(data, con=engine)
 df = df.sort_values(by=['pos'])
-df = df.replace('null', np.nan)
-# df.dropna(how='all', axis=1, inplace=True) # uncomment if you want to drop empty columns, might break something.
+df = df.replace('null', nan)
 
 # Decide what word to display in case of a random request.
 if args.random:
@@ -132,10 +118,10 @@ def print_sounds(idx):
         ls = json.loads(sounds[idx])
         for item in ls:
             if 'tags' in item and 'ipa' in item:
-                # console.print(f"[bold]IPA[/bold] : [bright_cyan]{item['ipa']}[/bright_cyan] [grey70]({item['tags'][0]})[/grey70]")
-                console.print(f"[bold]IPA[/bold] : [bright_cyan]{item['ipa']:<20}[/bright_cyan] [grey70]({item['tags'][0]})[/grey70]")
+                # console.print(f"[bold]IPA[/bold] : [bright_cyan]{item['ipa']}[/bright_cyan] [grey]({item['tags'][0]})[/grey70]")
+                console.print(f"[bold]IPA[/bold] : [{sound_color}]{item['ipa']:<20}[/{sound_color}] [{tag_color}]({item['tags'][0]})[/{tag_color}]")
             elif 'ipa' in item:
-                console.print(f"[bold]IPA[/bold] : [bright_cyan]{item['ipa']}[/bright_cyan]")
+                console.print(f"[bold]IPA[/bold] : [{sound_color}]{item['ipa']}[/{sound_color}]")
 def print_etymology(idx):
     """Print Etymology to console"""
     if pd.isnull(etymology[idx]) == False:
@@ -143,7 +129,7 @@ def print_etymology(idx):
         # print("  ", word[idx],f"({pos[idx]})")
         ety = etymology[idx]
         ety = Text(ety, overflow='crop')
-        ety.stylize("grey70")
+        ety.stylize(ety_color)
         ety = Padding(ety, (0,3))
         table = Table(show_lines=False, box=None, show_header=False, padding=(0, 0, 1, 0), pad_edge=False)
         table.add_column("etymology", justify="full", no_wrap=False,  max_width=94)
@@ -154,10 +140,8 @@ def print_definitions(idx):
     console.print("\n[bold][underline]Definitions[/underline] : \n")
     ls = json.loads(senses[idx])
     table = Table(show_lines=False, box=None, show_header=False, padding=(0, 0, 1, 0), pad_edge=False)
-
     table.add_column("n", justify='centre',no_wrap=True)
     table.add_column("Definition", justify="full", no_wrap=False,  max_width=82)
-
     for count, dct in enumerate(ls):
         if 'glosses' in dct:
             glosses = dct['glosses']
@@ -168,17 +152,15 @@ def print_definitions(idx):
             num = Text(f"{count}.")
             num = Padding(num, (0,3))
             table.add_row(num,glosses)
-
         if args.examples and 'examples' in dct:
             example = f"Ex: {dct['examples'][0]['text']}"
             example = Text(example)
-            example.stylize("grey70")
+            example.stylize(example_color)
             # example = Padding(example, (0,3))
             # console.print(example)
             table.add_row("",example)
     console.print(table)
     print()
-
 def print_synonyms(idx):
     """Print synonyms, antonyms, hypernyms, hyponyms, meronyms, troponyms and holonyms to console"""
     if 'synonyms' in keys and pd.isnull(df['synonyms'][idx]) == False:
@@ -252,20 +234,6 @@ def print_synonyms(idx):
                 tags = " / ".join(tags)
                 tags = f"({tags})"
             print(f"   {word:<20} {tags}")
-    if 'troponyms' in keys and pd.isnull(df['troponyms'][idx]) == False:
-        console.print("\n[bold][underline]Troponyms[/underline] :\n")
-        ls = json.loads(df['troponyms'][idx])
-        for item in ls:
-            word = ""
-            tags = ""
-            english = ""        
-            if 'word' in item:
-                word = item['word']
-            if 'tags' in item:
-                tags = item['tags']
-                tags = " / ".join(tags)
-                tags = f"({tags})"
-            print(f"   {word:<20} {tags}")
     if 'holonyms' in keys and pd.isnull(df['holonyms'][idx]) == False:
         console.print("\n[bold][underline]Holonyms[/underline] :\n")
         ls = json.loads(df['holonyms'][idx])
@@ -282,7 +250,7 @@ def print_synonyms(idx):
             print(f"   {word:<20} {tags}")
 # print functions ######
 
-###### execute #
+###### execution #
 if args.synonyms:
     for index, row in df.iterrows():
         print()
@@ -308,6 +276,4 @@ for index, row in df.iterrows():
     if args.etymology:
         print_etymology(index)
     print_definitions(index)
-# execute ######
-
-
+# execution ######
