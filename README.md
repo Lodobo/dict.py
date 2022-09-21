@@ -1,4 +1,4 @@
-# TUI-Dictionary
+# CLI-Dictionary
 
 ![screenshot.jpg](https://raw.githubusercontent.com/Lodobo/TUI-Dictionary/main/screenshot.jpg)
 
