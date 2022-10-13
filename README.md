@@ -4,7 +4,7 @@
 
 ## Description
 
-This repository has four scripts. `downloader.sh` is a bash script that downloads wiktionary entries from kaikki.org with `wget`. `todb.py` is a python script that parses the downloaded jsonl files and sends the information to a database. `downloadAndSendToDB.sh` is a bash script that downloads AND runs the todb.py script. Finally, `TDict.py` is a TUI dictionary implementation of the database.
+This repository has four scripts. `downloader.sh` is a bash script that downloads wiktionary entries from kaikki.org with `wget`. `todb.py` is a python script that parses the downloaded jsonl files and sends the information to a database. `downloadAndSendToDB.sh` is a bash script that downloads AND runs the todb.py script. Finally, `dict.py` is a CLI application that fetches word information from the database and displays it on the terminal.
 
 To quickly set up the database, it is possible to directly download a sql file. Just do the following :
 1) Install mysql
